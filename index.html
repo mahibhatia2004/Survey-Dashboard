@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pastel-pink': '#FFE1E6',
+                        'pastel-blue': '#E1F0FF',
+                        'pastel-green': '#E8F5E8',
+                        'pastel-purple': '#F0E6FF',
+                        'pastel-yellow': '#FFF9E1',
+                        'pastel-orange': '#FFE8D1'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            transform: translateX(4px);
+        }
+        
+        .active-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .bounce-in {
+            animation: bounceIn 0.6s ease-out;
+        }
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .floating-animation {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+        
+        .glow-effect:hover {
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
+        }
+        
+        .shimmer {
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+            background-size: 200% 200%;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% -200%; }
+            100% { background-position: 200% 200%; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-pastel-blue to-pastel-pink min-h-screen">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div class="w-80 bg-gradient-to-b from-white/95 to-purple-50/95 backdrop-blur-lg shadow-2xl border-r border-purple-200/50 flex flex-col relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-purple-400/10 to-pink-400/10 rounded-full -translate-y-16 translate-x-16"></div>
+            <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full translate-y-12 -translate-x-12"></div>
+            <div class="p-6 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-300 scrollbar-track-purple-100 relative z-10">
+                <!-- Logo/Header -->
+                <div class="flex items-center space-x-4 mb-10 floating-animation">
+                    <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center shadow-lg glow-effect">
+                        <span class="text-3xl">📊</span>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Survey Analytics</h1>
+                    </div>
+                </div>
+                
+                <!-- Navigation Items -->
+                <nav class="space-y-4">
+                    <div class="sidebar-item active-item rounded-2xl p-5 cursor-pointer shadow-lg glow-effect" onclick="showContent('overview')">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <span class="text-2xl">🏠</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg">Overview</div>
+                                <div class="text-sm opacity-90">Dashboard home</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-item bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl p-5 cursor-pointer hover:from-green-200 hover:to-emerald-200 shadow-md hover:shadow-lg transition-all duration-300" onclick="showContent('total-surveys')">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                                <span class="text-2xl">📈</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg text-gray-800">Total Surveys</div>
+                                <div class="text-sm text-gray-600">Bank locations & regions</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-item bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl p-5 cursor-pointer hover:from-purple-200 hover:to-pink-200 shadow-md hover:shadow-lg transition-all duration-300" onclick="showContent('by-surveys')">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                                <span class="text-2xl">👥</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg text-gray-800">By Surveys</div>
+                                <div class="text-sm text-gray-600">Individual responses</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-item bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl p-5 cursor-pointer hover:from-yellow-200 hover:to-orange-200 shadow-md hover:shadow-lg transition-all duration-300" onclick="showContent('by-city')">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                                <span class="text-2xl">🏙️</span>
+                            </div>
+                            <div>
+                                <div class="font-bold text-lg text-gray-800">By City</div>
+                                <div class="text-sm text-gray-600">Geographic analysis</div>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Quick Actions Dropdown -->
+                <div class="mt-8 relative">
+                    <button onclick="toggleDropdown()" class="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-xl font-semibold hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">⚡</span>
+                            <span>Quick Actions</span>
+                        </div>
+                        <span id="dropdown-arrow" class="text-xl transition-transform duration-300">▼</span>
+                    </button>
+                    
+                    <div id="dropdown-menu" class="hidden absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-purple-100 overflow-hidden z-50">
+                        <div class="p-2 space-y-1">
+                            <button onclick="viewReports()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 transition-all duration-200 flex items-center space-x-3 group">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">📈</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">View Reports</div>
+                                    <div class="text-sm text-gray-500">Analytics & insights</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="createSurvey()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 transition-all duration-200 flex items-center space-x-3 group">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">➕</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">New Survey</div>
+                                    <div class="text-sm text-gray-500">Create survey form</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="exportData()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gradient-to-r hover:from-green-50 hover:to-emerald-50 transition-all duration-200 flex items-center space-x-3 group">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">📤</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">Export Data</div>
+                                    <div class="text-sm text-gray-500">Download CSV/Excel</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="quickAdd()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gradient-to-r hover:from-orange-50 hover:to-yellow-50 transition-all duration-200 flex items-center space-x-3 group">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">🏦</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">Add Bank</div>
+                                    <div class="text-sm text-gray-500">Register new bank</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="quickSettings()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gradient-to-r hover:from-purple-50 hover:to-violet-50 transition-all duration-200 flex items-center space-x-3 group">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">⚙️</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">Settings</div>
+                                    <div class="text-sm text-gray-500">Dashboard preferences</div>
+                                </div>
+                            </button>
+                            
+                            <button onclick="quickHelp()" class="w-full text-left px-4 py-3 rounded-lg hover:bg-gradient-to-r hover:from-teal-50 hover:to-green-50 transition-all duration-200 flex items-center space-x-3 group">
+                                <span class="text-2xl group-hover:scale-110 transition-transform">❓</span>
+                                <div>
+                                    <div class="font-medium text-gray-800">Help & Support</div>
+                                    <div class="text-sm text-gray-500">Get assistance</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="mt-10 space-y-6">
+                    <div class="bg-gradient-to-br from-pink-400 to-purple-500 rounded-2xl p-6 shadow-xl text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <div class="text-3xl font-black">1,247</div>
+                                <div class="text-sm text-pink-100 font-semibold">Total Responses</div>
+                            </div>
+                            <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+                                <span class="text-3xl pulse-animation">✨</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl p-6 shadow-xl text-white relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
+                        <div class="relative z-10 flex items-center justify-between">
+                            <div>
+                                <div class="text-3xl font-black">89%</div>
+                                <div class="text-sm text-blue-100 font-semibold">Completion Rate</div>
+                            </div>
+                            <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+                                <span class="text-3xl pulse-animation">🎯</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto bg-gradient-to-br from-white/20 to-purple-50/30">
+            <div class="p-8 max-w-7xl mx-auto">
+                <!-- Overview Content -->
+                <div id="overview-content" class="content-section">
+                    <div class="mb-8 bounce-in">
+                        <h2 class="text-4xl font-bold text-gray-800 mb-2">Welcome to Survey Analytics! 🎉</h2>
+                        <p class="text-gray-600 text-lg">Get insights from your survey data with beautiful visualizations</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                        <div class="card-hover bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-3xl p-8 shadow-2xl border-0 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xl font-bold">Active Surveys</h3>
+                                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                                        <span class="text-3xl">📋</span>
+                                    </div>
+                                </div>
+                                <div class="text-4xl font-black mb-3">24</div>
+                                <div class="text-purple-100">Currently running</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-hover bg-gradient-to-br from-green-500 to-emerald-500 text-white rounded-3xl p-8 shadow-2xl border-0 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xl font-bold">Banks Covered</h3>
+                                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                                        <span class="text-3xl">🏦</span>
+                                    </div>
+                                </div>
+                                <div class="text-4xl font-black mb-3">156</div>
+                                <div class="text-green-100">Across all regions</div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-hover bg-gradient-to-br from-blue-500 to-cyan-500 text-white rounded-3xl p-8 shadow-2xl border-0 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full translate-y-12 -translate-x-12"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h3 class="text-xl font-bold">Cities</h3>
+                                    <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
+                                        <span class="text-3xl">🌆</span>
+                                    </div>
+                                </div>
+                                <div class="text-4xl font-black mb-3">42</div>
+                                <div class="text-blue-100">Major metropolitan areas</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-r from-orange-400 via-pink-400 to-purple-500 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-r from-orange-400/20 via-pink-400/20 to-purple-500/20 backdrop-blur-sm"></div>
+                        <div class="absolute top-0 left-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 -translate-x-20"></div>
+                        <div class="absolute bottom-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 translate-x-16"></div>
+                        
+                        <div class="relative z-10">
+                            <h3 class="text-2xl font-bold text-white mb-8 text-center flex items-center justify-center">
+                                <span class="mr-3 text-3xl">⚡</span>
+                                Quick Actions Dashboard
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <button onclick="viewReports()" class="group bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-6 rounded-2xl font-bold hover:bg-white hover:shadow-2xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 flex flex-col items-center space-y-3 relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="relative z-10 w-16 h-16 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <span class="text-3xl">📈</span>
+                                    </div>
+                                    <div class="relative z-10 text-center">
+                                        <div class="font-bold text-lg">View Reports</div>
+                                        <div class="text-sm text-gray-600">Analytics & Insights</div>
+                                    </div>
+                                </button>
+                                
+                                <button onclick="createSurvey()" class="group bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-6 rounded-2xl font-bold hover:bg-white hover:shadow-2xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 flex flex-col items-center space-y-3 relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="relative z-10 w-16 h-16 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <span class="text-3xl">➕</span>
+                                    </div>
+                                    <div class="relative z-10 text-center">
+                                        <div class="font-bold text-lg">New Survey</div>
+                                        <div class="text-sm text-gray-600">Create Form</div>
+                                    </div>
+                                </button>
+                                
+                                <button onclick="exportData()" class="group bg-white/90 backdrop-blur-sm text-gray-800 px-6 py-6 rounded-2xl font-bold hover:bg-white hover:shadow-2xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-2 flex flex-col items-center space-y-3 relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-green-400/20 to-emerald-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                    <div class="relative z-10 w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                        <span class="text-3xl">📤</span>
+                                    </div>
+                                    <div class="relative z-10 text-center">
+                                        <div class="font-bold text-lg">Export Data</div>
+                                        <div class="text-sm text-gray-600">Download Files</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Total Surveys Content -->
+                <div id="total-surveys-content" class="content-section hidden">
+                    <div class="mb-6 fade-in">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+                            <span class="mr-3">📈</span>
+                            Total Surveys Overview
+                        </h2>
+                        <p class="text-gray-600">Bank locations, regions, and survey distribution</p>
+                    </div>
+                    
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-green-100 overflow-hidden">
+                        <div class="p-6 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
+                            <h3 class="text-xl font-semibold text-gray-700 flex items-center">
+                                <span class="mr-2">🏦</span>
+                                Bank Survey Data
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Bank Name</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Location</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Region</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Total Surveys</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Completion Rate</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="hover:bg-green-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">State Bank of India</td>
+                                        <td class="px-6 py-4 text-gray-600">Mumbai, Maharashtra</td>
+                                        <td class="px-6 py-4 text-gray-600">Western India</td>
+                                        <td class="px-6 py-4 text-gray-600">247</td>
+                                        <td class="px-6 py-4 text-gray-600">94%</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Active ✅</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-green-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">HDFC Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">Bangalore, Karnataka</td>
+                                        <td class="px-6 py-4 text-gray-600">South India</td>
+                                        <td class="px-6 py-4 text-gray-600">189</td>
+                                        <td class="px-6 py-4 text-gray-600">87%</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Active ✅</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-green-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">ICICI Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">Delhi, NCR</td>
+                                        <td class="px-6 py-4 text-gray-600">North India</td>
+                                        <td class="px-6 py-4 text-gray-600">156</td>
+                                        <td class="px-6 py-4 text-gray-600">91%</td>
+                                        <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">Pending ⏳</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-green-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Axis Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">Kolkata, West Bengal</td>
+                                        <td class="px-6 py-4 text-gray-600">East India</td>
+                                        <td class="px-6 py-4 text-gray-600">203</td>
+                                        <td class="px-6 py-4 text-gray-600">89%</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Active ✅</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- By Surveys Content -->
+                <div id="by-surveys-content" class="content-section hidden">
+                    <div class="mb-6 fade-in">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+                            <span class="mr-3">👥</span>
+                            Individual Survey Responses
+                        </h2>
+                        <p class="text-gray-600">Detailed respondent information and feedback</p>
+                    </div>
+                    
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-purple-100 overflow-hidden">
+                        <div class="p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-b border-purple-100">
+                            <h3 class="text-xl font-semibold text-gray-700 flex items-center">
+                                <span class="mr-2">📝</span>
+                                Survey Respondents
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Respondent Name</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Bank Name</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Age</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Satisfaction</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Date</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Feedback</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="hover:bg-purple-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Priya Sharma</td>
+                                        <td class="px-6 py-4 text-gray-600">State Bank of India</td>
+                                        <td class="px-6 py-4 text-gray-600">34</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Excellent 😊</span></td>
+                                        <td class="px-6 py-4 text-gray-600">2024-01-15</td>
+                                        <td class="px-6 py-4 text-gray-600">बहुत अच्छी सेवा!</td>
+                                    </tr>
+                                    <tr class="hover:bg-purple-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Rajesh Kumar</td>
+                                        <td class="px-6 py-4 text-gray-600">HDFC Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">28</td>
+                                        <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">Good 😐</span></td>
+                                        <td class="px-6 py-4 text-gray-600">2024-01-14</td>
+                                        <td class="px-6 py-4 text-gray-600">Could be better</td>
+                                    </tr>
+                                    <tr class="hover:bg-purple-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Anita Patel</td>
+                                        <td class="px-6 py-4 text-gray-600">ICICI Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">42</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">Excellent 😊</span></td>
+                                        <td class="px-6 py-4 text-gray-600">2024-01-13</td>
+                                        <td class="px-6 py-4 text-gray-600">Very satisfied</td>
+                                    </tr>
+                                    <tr class="hover:bg-purple-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Vikram Singh</td>
+                                        <td class="px-6 py-4 text-gray-600">Axis Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">55</td>
+                                        <td class="px-6 py-4"><span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm">Poor 😞</span></td>
+                                        <td class="px-6 py-4 text-gray-600">2024-01-12</td>
+                                        <td class="px-6 py-4 text-gray-600">Needs improvement</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- By City Content -->
+                <div id="by-city-content" class="content-section hidden">
+                    <div class="mb-6 fade-in">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center">
+                            <span class="mr-3">🏙️</span>
+                            Geographic Analysis
+                        </h2>
+                        <p class="text-gray-600">Survey data organized by city and region</p>
+                    </div>
+                    
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-yellow-100 overflow-hidden">
+                        <div class="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 border-b border-yellow-100">
+                            <h3 class="text-xl font-semibold text-gray-700 flex items-center">
+                                <span class="mr-2">🗺️</span>
+                                City-wise Survey Distribution
+                            </h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">City Name</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Region</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Primary Bank</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Population</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Surveys</th>
+                                        <th class="px-6 py-4 text-left text-sm font-semibold text-gray-700">Avg Rating</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="hover:bg-yellow-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Mumbai</td>
+                                        <td class="px-6 py-4 text-gray-600">Western India</td>
+                                        <td class="px-6 py-4 text-gray-600">State Bank of India</td>
+                                        <td class="px-6 py-4 text-gray-600">12.4M</td>
+                                        <td class="px-6 py-4 text-gray-600">247</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">4.2 ⭐</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-yellow-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Bangalore</td>
+                                        <td class="px-6 py-4 text-gray-600">South India</td>
+                                        <td class="px-6 py-4 text-gray-600">HDFC Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">8.4M</td>
+                                        <td class="px-6 py-4 text-gray-600">189</td>
+                                        <td class="px-6 py-4"><span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm">3.8 ⭐</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-yellow-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Delhi</td>
+                                        <td class="px-6 py-4 text-gray-600">North India</td>
+                                        <td class="px-6 py-4 text-gray-600">ICICI Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">16.8M</td>
+                                        <td class="px-6 py-4 text-gray-600">156</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">4.1 ⭐</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-yellow-50 transition-colors">
+                                        <td class="px-6 py-4 font-medium text-gray-800">Kolkata</td>
+                                        <td class="px-6 py-4 text-gray-600">East India</td>
+                                        <td class="px-6 py-4 text-gray-600">Axis Bank</td>
+                                        <td class="px-6 py-4 text-gray-600">4.5M</td>
+                                        <td class="px-6 py-4 text-gray-600">203</td>
+                                        <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm">4.0 ⭐</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+
+    <script>
+        function showContent(section) {
+            // Hide all content sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all sidebar items
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach(item => {
+                item.classList.remove('active-item');
+                item.classList.add('bg-pastel-green', 'hover:bg-green-100');
+            });
+            
+            // Show selected content with animation
+            const targetContent = document.getElementById(section + '-content');
+            if (targetContent) {
+                targetContent.classList.remove('hidden');
+                targetContent.classList.add('fade-in');
+            }
+            
+            // Update active sidebar item
+            const clickedItem = event.currentTarget;
+            clickedItem.classList.add('active-item');
+            clickedItem.classList.remove('bg-pastel-green', 'hover:bg-green-100');
+            
+            // Update sidebar item colors based on section
+            updateSidebarColors(section);
+        }
+        
+        function updateSidebarColors(activeSection) {
+            const sidebarItems = document.querySelectorAll('.sidebar-item');
+            sidebarItems.forEach((item, index) => {
+                if (!item.classList.contains('active-item')) {
+                    item.classList.remove('bg-pastel-green', 'bg-pastel-purple', 'bg-pastel-yellow', 'hover:bg-green-100', 'hover:bg-purple-100', 'hover:bg-yellow-100');
+                    
+                    switch(index) {
+                        case 1: // Total Surveys
+                            item.classList.add('bg-pastel-green', 'hover:bg-green-100');
+                            break;
+                        case 2: // By Surveys
+                            item.classList.add('bg-pastel-purple', 'hover:bg-purple-100');
+                            break;
+                        case 3: // By City
+                            item.classList.add('bg-pastel-yellow', 'hover:bg-yellow-100');
+                            break;
+                    }
+                }
+            });
+        }
+        
+        // Quick Action Functions
+        function viewReports() {
+            alert('📊 Opening Reports Dashboard...\nThis would navigate to detailed analytics and charts!');
+            toggleDropdown();
+        }
+        
+        function createSurvey() {
+            alert('➕ Creating New Survey...\nThis would open the survey builder interface!');
+            toggleDropdown();
+        }
+        
+        function exportData() {
+            alert('📤 Exporting Data...\nThis would download your survey data as CSV/Excel!');
+            toggleDropdown();
+        }
+        
+        function quickSettings() {
+            alert('⚙️ Settings Panel\nDashboard preferences and configurations');
+            toggleDropdown();
+        }
+        
+        function quickHelp() {
+            alert('❓ Help & Support\nNeed assistance? Contact our support team!');
+            toggleDropdown();
+        }
+        
+        // Dropdown Functions
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdown-menu');
+            const arrow = document.getElementById('dropdown-arrow');
+            
+            if (dropdown.classList.contains('hidden')) {
+                dropdown.classList.remove('hidden');
+                dropdown.classList.add('fade-in');
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                dropdown.classList.add('hidden');
+                dropdown.classList.remove('fade-in');
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('dropdown-menu');
+            const button = event.target.closest('button[onclick="toggleDropdown()"]');
+            
+            if (!button && !dropdown.contains(event.target)) {
+                dropdown.classList.add('hidden');
+                dropdown.classList.remove('fade-in');
+                document.getElementById('dropdown-arrow').style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // Action Functions
+        function quickAdd() {
+            alert('🏦 Adding New Bank\nThis would open the bank registration form!');
+            toggleDropdown();
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some interactive animations
+            const cards = document.querySelectorAll('.card-hover');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.02)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+            
+
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ddb357027a596f',t:'MTc1NDk3Nzg4My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@latest/dist/umd/supabase.js"></script>
+<script>
+  const { createClient } = supabase;
+  const SUPABASE_URL = 'https://supabase.com/dashboard/project/cxukqmmclfatcknhpoct/integrations';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN4dWtxbW1jbGZhdGNrbmhwb2N0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTUwNjAwNjQsImV4cCI6MjA3MDYzNjA2NH0.hvRgDNES3ufnZ5LZtcPVcg-I2P19LYYYAPi6D_cHKqc';
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function fetchTableData() {
+    const { data, error } = await supabase.from('users').select('*');
+    if (error) console.error('Error:', error.message);
+    else displayData(data);
+  }
+
+  function displayData(data) {
+    const tableDataDiv = document.getElementById('tableData');
+    if (!data || data.length === 0) {
+      tableDataDiv.innerHTML = '<p>No data available</p>';
+      return;
+    }
+    let html = '<ul>';
+    data.forEach(item => {
+      html += `<li>${JSON.stringify(item)}</li>`; // Display all columns, adjust as needed
+    });
+    html += '</ul>';
+    tableDataDiv.innerHTML = html;
+  }
+
+  document.addEventListener('DOMContentLoaded', fetchTableData);
+</script>
+</html>
